@@ -1,0 +1,48 @@
+news:
+    name: News
+    singular_name: Item
+    fields:
+        title:
+            type: text
+            class: large
+        slug:
+            type: slug
+            uses: title
+        teaser:
+            type: html
+            height: 150px
+        type: 
+            type: text
+        target_version:
+            type: text
+            label: "MAX targeted version"
+            postfix: "Does this work?"
+        link: 
+            type: text
+    template: entry.twig
+
+
+hits:
+    name: Hits
+    singular_name: Hit
+    fields:
+        ip:
+            type: text 
+        php:
+            type: text 
+        db:
+            type: text 
+            
+          
+
+    template: page.twig
+       
+
+# possible field types:
+# text - varchar(256) - input type text
+# templateselect - varchar(256) - select with template filenames
+# image - varchar(256) - image select/upload widget, stored as filename
+# html - text (65kb) - wysiwyg element
+# textarea - varchar(32768) - <textarea>
+# datetime - datetime - date and time selector widget
+# date - datetime - date selector widget

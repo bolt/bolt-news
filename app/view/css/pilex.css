@@ -1,0 +1,323 @@
+
+/**
+ * Colour scheme: 
+ * - #214968 - base blue / #244055
+ * - #194770 - links, slightly blueer
+ 
+ * - #434341 - dark gray
+ * - #ebe9dd - Sand light
+ 
+ * not used: 
+ * - #a5d2db - light green/blue
+ * - #4c808b - darker green/blue 
+ * - #8B694C - light brown, complementary to green/blue
+ * - #3E2815 - brown, complementary to green/blue
+ */
+
+body {
+    background-image: url(/app/view/img/background.png);
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: Candara, "Helvetica Neue",Helvetica,Arial,sans-serif;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+	margin: 0.5em 0;
+}
+
+
+.navbar-fixed-top, .navbar-fixed-bottom  {    
+    position: static;
+    margin-bottom: 20px;
+    background-image: url(/app/view/img/dust_scratch.png); 
+    background-color: #244055;
+} 
+
+a {
+    color: #194770; /* #AE311A; */
+}
+
+a:hover {
+        color: #103060;    
+}
+
+tt {
+    color: #666;
+}
+
+
+
+.navbar-inner {
+
+	background-image: none;
+	background: transparent;
+	background-image: linear-gradient(bottom, rgba(0, 0, 0, 0.3) 10%, rgba(0, 0, 0, 0.0) 60%, rgba(51, 114, 161, 0.3) 100%);
+	background-image: -o-linear-gradient(bottom, rgba(0, 0, 0, 0.3) 10%, rgba(0, 0, 0, 0.0) 60%, rgba(51, 114, 161, 0.3) 100%);
+	background-image: -moz-linear-gradient(bottom, rgba(0, 0, 0, 0.3) 10%, rgba(0, 0, 0, 0.0) 60%, rgba(51, 114, 161, 0.3) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0.3) 10%, rgba(0, 0, 0, 0.0) 60%, rgba(51, 114, 161, 0.3) 100%);
+	background-image: -ms-linear-gradient(bottom, rgba(0, 0, 0, 0.3) 10%, rgba(0, 0, 0, 0.0) 60%, rgba(51, 114, 161, 0.3) 100%);
+
+    background-repeat: repeat-x;
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 rgba(0, 0, 0, 0.1) inset;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 0px;
+    min-height: 60px;
+
+}
+
+.navbar .brand {
+    position: absolute;
+    top: 0px;
+    left: 20px;
+	color: #FFF;
+	font-size: 38px;
+	font-family: Candara, "Helvetica Neue",Helvetica,Arial,sans-serif;
+	text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.3), 1px 1px 0px rgba(255, 255, 255, 0.3) ;
+}
+
+.navbar .brand span {
+    font-size: 70%;
+}
+
+.navbar .nav > li > a {
+    color: #DDD;
+    font-weight: bold;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.navbar .nav .active > a, 
+.navbar .nav .active > a:hover {
+    color: white;
+    text-decoration: none;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.navbar .nav-collapse .nav.pull-right {
+    margin-top: 10px;
+} 
+
+.navbar .divider-vertical {
+    background-color: #666;
+    border-right: 1px solid #888;
+    height: 40px;
+    margin: 0 4px;    
+}
+
+footer  {    
+    margin-top: 30px;
+    position: fixed;
+    bottom: 0;
+    border-top: 1px solid #CCC; 
+    background-color: #DDD;
+    color: #999;
+    width:100%; 
+    padding: 4px 10px;
+}
+
+
+/**
+ * Dashboard specific stuff
+ */
+
+.quicklinks {
+    margin-bottom: 8px;
+
+}
+
+.morelink {
+    font-size: 12px;
+    float: right;
+    text-shadow: none;
+    line-height: 10px;
+    position: relative;
+    right: 0;
+    top: 15px;
+}
+
+.dashboardlisting {
+    background-color: #FFF;
+    box-shadow:  1px 1px 2px 0px rgba(0, 0, 0, 0.3);
+    margin-bottom: 10px;   
+}
+
+.dashboardlisting tr:nth-child(odd) {
+    background-color: #F2F2EC; /* #FAFAF4; */
+}
+
+.dashboardlisting tr.dim * {
+    background-color: #F8F8FB;
+    color: #BBB !important;
+}
+
+.dashboardlisting td {
+    border: 1px solid #DDD;
+    padding: 5px;
+    vertical-align: top;
+    line-height: 18px;
+    font-size: 13px;    
+}
+
+.dashboardlisting td.id, 
+.dashboardlisting td.username,
+.dashboardlisting td.actions,
+.dashboardlisting td.listthumb  {
+    white-space: nowrap;
+    text-align: center;
+    color: #666;    
+
+}
+
+.dashboardlisting td.listthumb {
+    padding: 2px;
+}
+
+.dashboardlisting td.actions {
+    min-width: 60px;
+}
+
+.dashboardlisting td.excerpt span {
+    height: 36px;
+    display: block;
+    color: #666;
+    overflow: hidden;
+}
+
+.dashboardlisting td.excerpt.large span {
+    height: 54px;
+}
+
+ul.dropdown-menu li {
+    text-align: left;
+}
+
+ul.dropdown-menu li a.nolink {
+    background-color: transparent !important;
+    color: #333;
+}
+
+
+
+aside section {
+    background-color: #ebe9dd;
+    border: 1px solid #CCB;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    box-shadow:  2px 2px 2px 0px rgba(0, 0, 0, 0.1);
+    padding: 0 10px 10px;
+    margin-bottom: 20px;
+}
+
+aside section h2 {
+    font-size: 14px;
+    line-height: 18px;
+    margin: 8px 0 4px;
+	text-shadow: none;
+	color: #333;    
+}
+
+
+
+aside section p {
+    font-size: 12px;
+    line-height: 16px;
+    margin: 4px 0;
+}
+
+
+/**
+ * Editing content ..
+ */ 
+label {
+    min-width: 150px;
+    margin: 1em 0 0.5em;
+}
+
+label.permalink {
+    margin: 0 0 0.5em;
+}
+
+label span.left {
+    display: block;
+    float: left;
+    min-width: 100px;
+}
+
+#editcontent input.large {
+    font-size: 133%;
+    width: 95%;
+}
+
+#editcontent input.narrow {
+    width: 30%;
+    min-width: 200px;
+}
+
+#editcontent input {
+    font-size: 100%;
+    width: 95%;
+}
+
+#editcontent textarea {
+    height: 300px;
+}
+
+#editcontent div.image-container {
+    height: 120px;
+    padding-right: 130px;
+}
+
+#editcontent div.image-right {
+    float: right;
+    width: 128px;   
+}
+
+#editcontent .imageholder {
+    border: 1px solid #BBB;
+    width: 120px;
+    height: 120px;
+    padding: 2px;
+    box-shadow:  1px 1px 2px 0px rgba(0, 0, 0, 0.3);
+}
+
+#editcontent .imageinput {
+    border: 1px solid #BBB;
+}
+
+
+
+@media (max-width: 768px) {
+
+  .container-fluid {
+    margin-right: -12px;
+    margin-left: -12px;
+  }
+  
+
+}
+
+
+@media (max-width: 979px) {
+    
+    ul.dropdown-menu li {
+        float: left;
+        padding: 0;
+    }
+
+    .nav-collapse .nav > li {
+        clear: both;
+        
+    }
+    
+    .nav-collapse .nav .nav-header {
+        clear: both;
+        float: none;
+        padding: 5px 12px;
+    }    
+        
+    .nav-collapse .nav > li > a, .nav-collapse .dropdown-menu a {
+        padding: 5px 12px;
+        color: #CCC;
+    }        
+        
+}

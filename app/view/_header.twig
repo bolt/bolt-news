@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Pilex {% if title is defined %}- {{title}}{% endif %}</title>
+    
+    <link rel="stylesheet" href="/app/view/css/bootstrap.css" />
+    <link rel="stylesheet" href="/app/view/css/bootstrap-responsive.css" />
+    <link rel="stylesheet" href="/app/view/css/pilex.css" />
+    {# <link rel="stylesheet" href="/app/view/css/responsivebar.css" /> #}
+    <script src="/app/view/js/jquery-1.7.2.min.js"></script>
+    <script src="/app/view/js/jquery.plugins.js"></script>
+    <script src="/app/view/js/bootstrap.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/app/view/lib/shadowbox/shadowbox.css">
+<script type="text/javascript" src="/app/view/lib/shadowbox/shadowbox.js"></script>
+
+    
+    <script src="/app/view/js/pilex.js"></script>
+
+    <!-- redactor --> 
+    <link rel="stylesheet" href="/app/view/lib/redactor/css/redactor.css" />
+	<script src="/app/view/lib/redactor/redactor.js"></script>    
+
+
+</head>
+<body>
+    
+{% if active is not defined %}{% set active="dashboard" %}{% endif %}
+    
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="{{ path('dashboard') }}">
+                <strong>Pilex</strong> <span class="hidden-phone"> {% if app.config.general.sitename is defined %}- {{app.config.general.sitename}}{% endif %}</span>
+            </a>
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                    <li class="{% if active in ['', 'dashboard'] %}active {% endif %}"><a href="{{ path('dashboard') }}">Dashboard</a></li>
+                    <li class="{% if active=='content' %}active {% endif %}dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Content
+                            <b class="caret"></b>
+                            </a>
+                        <ul class="dropdown-menu">
+                            {% for slug, contenttype in app.config.contenttypes %}
+                            <li><a href="{{ path('overview', { 'contenttypeslug': slug }) }}">View {{ contenttype.name }}</a></li>
+                            <li><a href="{{ path('editcontent', { 'contenttypeslug': slug, 'id': '' }) }}">New {{ contenttype.singular_name }}</a></li>
+                            {% if not loop.last %}<li class="divider"></li>{% endif %}
+                            {% endfor %}
+                            
+                        </ul>
+                    </li>                    
+                    <li class="{% if active=='settings' %}active {% endif %}dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings
+                            <b class="caret"></b>
+                            </a>
+                        <ul class="dropdown-menu">
+                            <li class="nav-header">Configuration</li>
+                            <li><a href="{{ path('users') }}">Users</a></li>
+                            <li><a href="">Contenttypes</a></li>
+                            <li><a href="">Taxonomy</a></li>
+                            <li class="divider"></li>
+                            <li class="nav-header">Maintenance</li>
+                            <li><a href="{{ path('dbupdate') }}">Check database</a></li>
+                        </ul>
+                    </li>
+                    <li class="divider-vertical"></li>
+                    <li><a href="/" target="_blank">View site</a></li>                    
+                    <li class="divider-vertical"></li>
+                    <li>
+                        {% if app.session.get('user') is not null %}
+                        <a href="{{ path('logout') }}">Logout {{ app.session.get('user').username }}</a> 
+                        {% else %}
+                        <a href="{{ path('login') }}">Login</a> 
+                        {% endif %}
+                    </li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+
+{% if app.session.hasFlash('info') %}
+	<div class="alert alert-info">
+    	<button class="close" data-dismiss="alert">×</button>
+		{{ app.session.flash('info') }}
+	</div>
+{% endif %}
+
+{% if app.session.hasFlash('error') %}
+	<div class="alert alert-error">
+    	<button class="close" data-dismiss="alert">×</button>
+		{{ app.session.flash('error') }}
+	</div>
+{% endif %}
+
+{% if app.session.hasFlash('success') %}
+	<div class="alert alert-success">
+    	<button class="close" data-dismiss="alert">×</button>
+		{{ app.session.flash('success') }}
+	</div>
+{% endif %}

@@ -1,0 +1,10 @@
+
+database:
+  username: bolt_news
+  password: XXXXXXXXXX
+  databasename: bolt_news
+  prefix: news
+
+sitename: Pilex news
+homepage: page/1
+homepage_template: index.twig

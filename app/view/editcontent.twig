@@ -1,0 +1,177 @@
+{% include '_header.twig' with { 'active':'content' } %}
+
+
+<div class="row-fluid">
+    <div class="span9">
+
+    <form method="post" id="editcontent">
+        
+    {%for key, fields in contenttype.fields %}
+    
+        {% if fields.type == "text" %}
+        <label><b>{{ key|ucfirst}}</b></label>
+        <input type="text" name="{{key}}" id="{{key}}"
+            value='{{ content[key] }}'
+            class='{% if fields.class is defined %}{{ fields.class }}{% endif %}'>
+        {% endif %}
+        
+        {% if fields.type == "slug" %}
+        <label class='permalink'>
+        Permalink: <tt>/{{contenttype.singular_slug}}/<input type="text" name="{{key}}"  id="{{key}}"
+            value='{{ content[key] }}'
+            class='editslug'></tt>
+        </label>
+            
+<script type="text/javascript"> 
+    $("#title").slug({ slug:'editslug', hide: true });
+</script>
+        {% endif %}
+    
+    
+        {% if fields.type == "image" %}
+        <div class="image-right">
+            <div class='imageholder' id="thumbnail-{{key}}">
+                {% if content[key]!="" %}
+                <img src="/thumbs/120x120c/{{ content[key] }}" width="120" height="120">
+                {% endif %}
+            </div>
+        </div>
+        <div class="image-container" id="container-{{key}}">
+
+            <label><b>{{ key|ucfirst}}</b></label>
+            
+            <input type="text" name="{{key}}" id="field-{{key}}"
+                value='{{ content[key] }}'
+                class='{% if fields.class is defined %}{{ fields.class }}{% endif %} imageinput'>
+
+<!-- The fileinput-button span is used to style the file input field as button -->
+                <span class="btn btn-info fileinput-button">
+                    <i class="icon-upload icon-white"></i>
+                    <span>Upload Image</span>
+                    <input id="fileupload-{{key}}" type="file" name="files[]" data-url="/app/classes/upload/" multiple>
+                </span>
+                <div class="progress active" id="progress-{{key}}" style="width: 50%; display: none;">
+                    <div class="bar" style="width: 0%;"></div>
+                </div>
+                
+<link rel="stylesheet" href="/app/view/lib/upload/jquery.fileupload-ui.css">
+<script src="/app/view/lib/upload/jquery.ui.widget.js"></script>
+<script src="/app/view/lib/upload/jquery.iframe-transport.js"></script>
+<script src="/app/view/lib/upload/jquery.fileupload.js"></script>
+<script>
+$(function () {
+    $('#fileupload-{{key}}').fileupload({
+        dataType: 'json',
+        dropZone: $("#container-{{key}}"),
+        done: function (e, data) {
+            $.each(data.result, function (index, file) {
+                $('#field-{{key}}').val(file.name);
+                $('#thumbnail-{{key}}').html("<img src='/thumbs/120x120c/"+encodeURI(file.name)+"' width='120' height='120'>");
+                $('#progress-{{key}} div.bar').css('width', "100%");
+                $('#progress-{{key}}').removeClass('progress-striped');
+                window.setTimeout(function(){ $('#progress-{{key}}').fadeOut('slow'); }, 3000);
+            });
+        }
+    });
+
+    $('#fileupload-{{key}}').bind('fileuploadprogress', function (e, data) {        
+        var progress = Math.round(100 * data._bitrateTimer.loaded / data.files[0].size);
+        $('#progress-{{key}}').show().addClass('progress-striped');
+        $('#progress-{{key}} div.bar').css('width', progress+"%");
+    });
+      
+    
+});
+</script>
+<style>
+
+
+
+</style>
+
+
+        </div>
+        {% endif %}
+                
+    
+        {% if fields.type == "html" %}
+        <label><b>{{ key|ucfirst}}</b></label>
+        <textarea name="{{key}}" class='{% if fields.class is defined %}{{ fields.class }}{% endif %} redactor'
+            style='{% if fields.height is defined %}height: {{ fields.height }} !important;{% endif %}'>
+            {% if content[key] is defined %}{{ content[key] }}{% endif %}
+        </textarea>
+        {% endif %}
+                
+    
+    {% endfor %}
+        
+        <label><span class='left'>Id:</span>
+        <input type='text' readonly=readonly name='id' value='{{ content.id }}' class="narrow">
+        </label>
+        
+        <label><span class='left'>Created on:</span>
+        <input type='text' readonly name=' class="narrow"' 
+            value='{{ content.datecreated }}' class="narrow">
+        </label>
+        
+        <label><span class='left'>Last edited:</span>
+        <input type='text' readonly name='datechanged' 
+            value='{{ content.datechanged }}' class="narrow">
+        </label>
+        
+        <label><span class='left'>Status:</span>
+        <select name="status">
+            <option value="published" {% if content.status == "published" %}selected{% endif %}>Published</option>
+            <option value="held" {% if content.status == "held" %}selected{% endif %}>Not published</option>
+            <option value="timed" {% if content.status == "timed" %}selected{% endif %}>Timed publish</option>            
+            <option value="draft" {% if content.status == "draft" %}selected{% endif %}>Draft</option>
+            <option value="depublished" {% if content.status == "depublished" %}selected{% endif %}>Depublished</option>
+            
+        </select>
+        </label>
+    
+        <button type="submit" class="btn btn-primary" id="savebutton">Save {{ contenttype.singular_name }}</button> 
+        
+    </form>
+        
+
+    </div><!-- /span9 -->
+    <aside class="span3">
+
+    <section>
+    <h2>Actions for this {{ contenttype.singular_name }}</h2>
+    
+    <a class="btn btn-primary" id="sidebarsave">Save {{ contenttype.singular_name }}</a>
+    <a class="btn btn-info" id="sidebarview" href="" target="_blank">View {{ contenttype.singular_name }}</a>
+    <script>
+        $('#sidebarsave').bind('click', function(){ $('#savebutton').trigger('click'); });
+        
+        $('#sidebarview').bind('click', function(){ 
+            
+            var link = "/{{contenttype.singular_slug}}/" + $('input[name=slug]').val();
+            
+            $('#sidebarview').attr('href', link);
+            
+        });
+    
+    
+    </script>
+    
+    
+    
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Haec mihi videtur delicatior, ut ita dicam, molliorque ratio, quam virtutis vis gravitasque postulat. Ergo opifex plus sibi proponet ad formarum quam civis excellens ad factorum pulchritudinem? Hic Speusippus, hic Xenocrates, hic eius auditor Polemo, cuius illa ipsa sessio fuit, quam videmus. </p>
+    </section>
+    
+    
+    <section>
+    <h2>Haec mihi videtur delicatior</h2>
+    <p>Cuius ad naturam apta ratio vera illa et summa lex a philosophis dicitur. Non enim, si omnia non sequebatur, idcirco non erat ortus illinc. Duo Reges: constructio interrete. Non igitur bene. Vide, ne etiam menses!</p><p>nisi forte eum dicis, qui, simul atque arripuit, interficit. Sunt autem, qui dicant foedus esse quoddam sapientium, ut ne minus amicos quam se ipsos diligant. </p>
+    </section>
+    
+    
+    
+    </aside>
+</div> 
+    
+
+{% include '_footer.twig' %}

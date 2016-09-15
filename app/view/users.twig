@@ -1,0 +1,75 @@
+{% include '_header.twig' with { 'active':'settings' } %}
+
+
+<div class="row-fluid">
+    <div class="span9">
+
+        <h1>{{title}}</h1>
+
+    
+    
+    
+
+    <table class='dashboardlisting'>
+        {% for user in users %}
+        
+        <tr class="{% if user.enabled==0 %}dim{% endif %}">
+            <td class='id'>№ {{user.id}}</td>
+            
+            <td><strong>{{ user.displayname }}</strong> ({{ user.username}}) </td>
+            <td><strong>{{ user.userlevel }} </td>
+            <td class='actions'>
+    <div class="btn-group">
+    <button class="btn btn-mini"><a href="{{ path('useredit', { 'id' : user.id }) }}">Edit</a></button>
+    <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown">
+    <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu pull-right">
+        
+
+        {% if user.enabled %}
+        <li><a href="{{ path('useraction', { 'action': 'disable', 'id': user.id }) }}">Disable {{user.username}}</a></li>
+        {% else %}
+        <li><a href="{{ path('useraction', { 'action': 'enable', 'id': user.id }) }}">Enable {{user.username}}</a></li>
+        {% endif %}        
+        <li><a href="{{ path('useraction', { 'action': 'delete', 'id': user.id }) }}" class="confirm" data-confirm="Are you sure you want to delete '{{user.displayname}}'?">Delete {{user.username}}</a></li>
+        <li class="divider"></li>
+        <li class="nolink"><a>Last seen: <strong>{% if user.lastip!="" %}{{ user.lastseen|date("Y-m-d H:i") }}{% else %}-{% endif %}</strong></a></li>
+        <li class="nolink"><a>Last known IP: <strong>{% if user.lastip!="" %}{{ user.lastip }}{% else %}-{% endif %}</strong></a></li>
+        
+        
+    </ul>
+    </div>
+            
+            </td>
+        </tr>
+    
+        {% endfor %}
+    
+    </table>
+    
+  
+    
+    </div><!-- /span9 -->
+    <aside class="span3">
+
+    <section>
+    <h2>Actions for Users</h2>
+
+    <a class="btn" href="{{ path('useredit', { 'id' : '' }) }}">New user</a>
+    
+       </section>
+    
+    
+    <section>
+    <h2>Haec mihi videtur delicatior</h2>
+    <p>Cuius ad naturam apta ratio vera illa et summa lex a philosophis dicitur. Non enim, si omnia non sequebatur, idcirco non erat ortus illinc. Duo Reges: constructio interrete. Non igitur bene. Vide, ne etiam menses!</p><p>nisi forte eum dicis, qui, simul atque arripuit, interficit. Sunt autem, qui dicant foedus esse quoddam sapientium, ut ne minus amicos quam se ipsos diligant. </p>
+    </section>
+    
+    
+    
+    </aside>
+</div> 
+    
+
+{% include '_footer.twig' %}
