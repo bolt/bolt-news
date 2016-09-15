@@ -18,8 +18,10 @@ $app->get("/", function(Silex\Application $app) {
         }
     }
 
+    $name = !empty($_GET['name']) ? $_GET['name'] : "" ;
+
     // Check if seen before..
-    $stmt = $app['storage']->db->query("SELECT * FROM newshits WHERE ip = '". $_SERVER['REMOTE_ADDR'] ."' AND hostname='". base64_decode($_GET['name']) ."';");
+    $stmt = $app['storage']->db->query("SELECT * FROM newshits WHERE ip = '". $_SERVER['REMOTE_ADDR'] ."' AND hostname='". base64_decode($name) ."';");
 
     $row = $stmt->fetch(2);
 
@@ -36,7 +38,7 @@ $app->get("/", function(Silex\Application $app) {
             'db' => $db,
             'datelastseen' => date('Y-m-d H:i:s'),
             'count' => $row['count'] + 1,
-            'hostname' => base64_decode($_GET['name'])
+            'hostname' => base64_decode($name)
         );
 
         $row = $app['storage']->db->update('newshits', $record, array('id' => $row['id']));

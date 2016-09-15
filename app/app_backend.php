@@ -7,34 +7,29 @@ use Symfony\Component\HttpFoundation\Response;
  * Middleware function to check whether a user is logged on.
  */
 $checkLogin = function(Request $request) use ($app) {
-   
 
     $route = $request->get('_route');
-    
-    
-          
+
     // There's an active session, we're all good.
     if ($app['session']->has('user')) {
         return;
-    } 
-    
-
+    }
 
     // If the users table is present, but there are no users, and we're on /pilex/users/edit,
-    // we let the user stay, because they need to set up the first user. 
+    // we let the user stay, because they need to set up the first user.
     if ($app['storage']->checkUserTableIntegrity() && !$app['users']->getUsers() && $request->getPathInfo()=="/pilex/users/edit/") {
         return;
-    } 
+    }
 
-    // If there are no users in the users table, or the table doesn't exist. Repair 
-    // the DB, and let's add a new user. 
+    // If there are no users in the users table, or the table doesn't exist. Repair
+    // the DB, and let's add a new user.
     if (!$app['storage']->checkUserTableIntegrity() || !$app['users']->getUsers()) {
         $app['storage']->repairTables();
-        $app['session']->setFlash('info', "There are no users in the database. Please create the first user.");    
+        $app['session']->getFlashBag()->add('info', "There are no users in the database. Please create the first user.");
         return $app->redirect('/pilex/users/edit');
     }
 
-    $app['session']->setFlash('info', "Please log on.");
+    $app['session']->getFlashBag()->add('info', "Please log on.");
     return $app->redirect('/pilex/login');
 
 };
@@ -51,12 +46,12 @@ $backend->get("/", function(Silex\Application $app) {
 
     // Check DB-tables integrity
     if (!$app['storage']->checkTablesIntegrity()) {
-        $app['session']->setFlash('error', "The database needs to be updated / repaired. Go to 'Settings' > 'Check Database' to do this now.");   
+        $app['session']->getFlashBag()->add('error', "The database needs to be updated / repaired. Go to 'Settings' > 'Check Database' to do this now.");
     }
 
-    // get the 'latest' from each of the content types. 
-    foreach ($app['config']['contenttypes'] as $key => $contenttype) { 
-        $latest[$key] = $app['storage']->getContent($key, array('limit' => 5, 'order' => 'datechanged DESC'));   
+    // get the 'latest' from each of the content types.
+    foreach ($app['config']['contenttypes'] as $key => $contenttype) {
+        $latest[$key] = $app['storage']->getContent($key, array('limit' => 5, 'order' => 'datechanged DESC'));
     }
 
     return $app['twig']->render('dashboard.twig', array('latest' => $latest));
@@ -71,19 +66,19 @@ $backend->get("/", function(Silex\Application $app) {
 $backend->match("/login", function(Silex\Application $app, Request $request) {
 
     if ($request->getMethod() == "POST") {
-      
+
         $username = makeSlug($request->get('username'));
-  
+
         // echo "<pre>\n" . print_r($request->get('username') , true) . "</pre>\n";
-    
+
         $result = $app['users']->login($request->get('username'), $request->get('password'));
-        
+
         if ($result) {
             return $app->redirect('/pilex');
         }
-    
+
     }
-    
+
     return $app['twig']->render('login.twig');
 
 })->method('GET|POST')->bind('login');
@@ -94,11 +89,11 @@ $backend->match("/login", function(Silex\Application $app, Request $request) {
  */
 $backend->get("/logout", function(Silex\Application $app) {
 
-	$app['session']->setFlash('info', 'You have been logged out.');
+	$app['session']->getFlashBag()->add('info', 'You have been logged out.');
     $app['session']->remove('user');
-    
+
     return $app->redirect('/pilex/login');
-        
+
 })->bind('logout');
 
 
@@ -107,11 +102,11 @@ $backend->get("/logout", function(Silex\Application $app) {
  * Check the database, create tables, add missing/new columns to tables
  */
 $backend->get("/dbupdate", function(Silex\Application $app) {
-	
+
 	$title = "Database check / update";
 
 	$output = $app['storage']->repairTables();
-	
+
 	if (empty($output)) {
     	$content = "<p>Your database is already up to date.<p>";
 	} else {
@@ -119,15 +114,15 @@ $backend->get("/dbupdate", function(Silex\Application $app) {
     	$content .= implode("<br>", $output);
     	$content .= "<p>Your database is now up to date.<p>";
 	}
-	
+
 	$content .= "<br><br><p><a href='/pilex/prefill'>Fill the database</a> with Loripsum.</p>";
-	
+
 	return $app['twig']->render('base.twig', array(
-	   'title' => $title, 
+	   'title' => $title,
 	   'content' => $content,
 	   'active' => "settings"
 	   ));
-	
+
 })->before($checkLogin)->bind('dbupdate');
 
 
@@ -135,13 +130,13 @@ $backend->get("/dbupdate", function(Silex\Application $app) {
  * Generate some lipsum in the DB.
  */
 $backend->get("/prefill", function(Silex\Application $app) {
-	
+
 	$title = "Database prefill";
 
 	$content = $app['storage']->preFill();
-	
+
 	return $app['twig']->render('base.twig', array('title' => $title, 'content' => $content));
-	
+
 })->before($checkLogin)->bind('prefill');
 
 
@@ -149,13 +144,13 @@ $backend->get("/prefill", function(Silex\Application $app) {
  * Check the database, create tables, add missing/new columns to tables
  */
 $backend->get("/overview/{contenttypeslug}", function(Silex\Application $app, $contenttypeslug) {
-	
+
     $contenttype = $app['storage']->getContentType($contenttypeslug);
 
 	$multiplecontent = $app['storage']->getContent($contenttype['slug'], array('limit' => 100, 'order' => 'datechanged DESC'));
 
 	return $app['twig']->render('overview.twig', array('contenttype' => $contenttype, 'multiplecontent' => $multiplecontent));
-	
+
 })->before($checkLogin)->bind('overview');
 
 
@@ -163,31 +158,31 @@ $backend->get("/overview/{contenttypeslug}", function(Silex\Application $app, $c
  * Edit a unit of content, or create a new one.
  */
 $backend->match("/edit/{contenttypeslug}/{id}", function($contenttypeslug, $id, Silex\Application $app, Request $request) {
-        
+
     $twigvars = array();
-    
-    $contenttype = $app['storage']->getContentType($contenttypeslug);        
-        
+
+    $contenttype = $app['storage']->getContentType($contenttypeslug);
+
     if ($request->getMethod() == "POST") {
-        
+
         // $app['storage']->saveContent($contenttypeslug)
         if ($app['storage']->saveContent($request->request->all(), $contenttype['slug'])) {
-        
+
             if (!empty($id)) {
-                $app['session']->setFlash('success', "The changes to this " . $contenttype['singular_name'] . " have been saved."); 
+                $app['session']->getFlashBag()->add('success', "The changes to this " . $contenttype['singular_name'] . " have been saved.");
             } else {
-                $app['session']->setFlash('success', "The new " . $contenttype['singular_name'] . " have been saved."); 
+                $app['session']->getFlashBag()->add('success', "The new " . $contenttype['singular_name'] . " have been saved.");
             }
             return $app->redirect('/pilex/overview/'.$contenttypeslug);
-        
+
         } else {
-        
-            $app['session']->setFlash('error', "There was an error saving this " . $contenttype['singular_name'] . "."); 
-        
-        } 
-    
-    }      
-      
+
+            $app['session']->getFlashBag()->add('error', "There was an error saving this " . $contenttype['singular_name'] . ".");
+
+        }
+
+    }
+
 	if (!empty($id)) {
       	$content = $app['storage']->getSingleContent($contenttypeslug, array('where' => 'id = '.$id));
 	} else {
@@ -195,7 +190,7 @@ $backend->match("/edit/{contenttypeslug}/{id}", function($contenttypeslug, $id, 
 	}
 
 	return $app['twig']->render('editcontent.twig', array('contenttype' => $contenttype, 'content' => $content));
-	
+
 })->before($checkLogin)->assert('id', '\d*')->method('GET|POST')->bind('editcontent');
 
 
@@ -207,8 +202,8 @@ use Symfony\Component\Form\CallbackValidator;
 use Symfony\Component\Validator\Constraints as Assert;
 
 $backend->match("/users/edit/{id}", function($id, Silex\Application $app, Request $request) {
-    
-    // Get the user we want to edit (if any)    
+
+    // Get the user we want to edit (if any)
     if (!empty($id)) {
         $user = $app['users']->getUser($id);
         $title = "Edit a user";
@@ -216,7 +211,7 @@ $backend->match("/users/edit/{id}", function($id, Silex\Application $app, Reques
         $user = $app['users']->getEmptyUser();
         $title = "Create a new user";
     }
-    
+
     $userlevels = $app['users']->getUserLevels();
     $enabledoptions = array(1 => 'yes', 0 => 'no');
     // If we're creating the first user, we should make sure that we can only create
@@ -224,16 +219,16 @@ $backend->match("/users/edit/{id}", function($id, Silex\Application $app, Reques
     if(!$app['users']->getUsers()) {
         $userlevels = array_slice($userlevels, -1);
         $enabledoptions = array(1 => 'yes');
-        $title = "Create the first user";        
+        $title = "Create the first user";
     }
-    
+
     // Start building the form..
     $form = $app['form.factory']->createBuilder('form', $user)
         ->add('id', 'hidden')
         ->add('username', 'text', array(
             'constraints' => array(new Assert\NotBlank(), new Assert\MinLength(2))
         ));
-        
+
     // If we're adding a new user, the password will be mandatory. If we're
     // editing an existing user, we can leave it blank
     if (empty($id)) {
@@ -251,9 +246,9 @@ $backend->match("/users/edit/{id}", function($id, Silex\Application $app, Reques
             ->add('password_confirmation', 'password', array(
                 'required' => false,
                 'label' => "Password (confirmation)"
-            ));        
+            ));
     }
-        
+
     // Contiue with the rest of the fields.
     $form->add('email', 'text', array(
             'constraints' => new Assert\Email(),
@@ -262,74 +257,74 @@ $backend->match("/users/edit/{id}", function($id, Silex\Application $app, Reques
             'constraints' => array(new Assert\NotBlank(), new Assert\MinLength(2))
         ))
         ->add('userlevel', 'choice', array(
-            'choices' => $userlevels, 
+            'choices' => $userlevels,
             'expanded' => false,
-            'constraints' => new Assert\Choice(array_keys($userlevels)) 
+            'constraints' => new Assert\Choice(array_keys($userlevels))
         ))
         ->add('enabled', 'choice', array(
-            'choices' => $enabledoptions, 
+            'choices' => $enabledoptions,
             'expanded' => false,
-            'constraints' => new Assert\Choice(array_keys($enabledoptions)), 
+            'constraints' => new Assert\Choice(array_keys($enabledoptions)),
             'label' => "User is enabled",
         ))
         ->add('lastseen', 'text', array('disabled' => true))
         ->add('lastip', 'text', array('disabled' => true));
-        
+
     // Make sure the passwords are identical with a custom validator..
     $form->addValidator(new CallbackValidator(function($form) {
-    
+
         $pass1 = $form['password']->getData();
         $pass2 = $form['password_confirmation']->getData();
-    
-        // Some checks for the passwords.. 
+
+        // Some checks for the passwords..
         if (!empty($pass1) && strlen($pass1)<6 ) {
             $form['password']->addError(new FormError('This value is too short. It should have 6 characters or more.'));
         } else if ($pass1 != $pass2 ) {
             $form['password_confirmation']->addError(new FormError('Passwords must match.'));
         }
-                    
+
     }));
-        
+
     $form = $form->getForm();
-       
+
     // Check if the form was POST-ed, and valid. If so, store the user.
     if ($request->getMethod() == "POST") {
         $form->bindRequest($request);
 
         if ($form->isValid()) {
-            
+
             $user = $form->getData();
-        
+
             $res = $app['users']->saveUser( $user );
-            
+
             if ($res) {
-                $app['session']->setFlash('success', "User " . $user['username'] . " has been saved."); 
+                $app['session']->getFlashBag()->add('success', "User " . $user['username'] . " has been saved.");
             } else {
-                $app['session']->setFlash('error', "User " . $user['username'] . " could not be saved, or nothing was changed."); 
+                $app['session']->getFlashBag()->add('error', "User " . $user['username'] . " could not be saved, or nothing was changed.");
             }
-            
+
             return $app->redirect('/pilex/users');
-            
+
         }
     }
 
     return $app['twig']->render('edituser.twig', array(
         'form' => $form->createView(),
         'title' => $title
-        ));      
-      
+        ));
+
 })->before($checkLogin)->assert('id', '\d*')->method('GET|POST')->bind('useredit');
 
 
 /**
  * Show the 'about' page */
 $backend->get("/about", function(Silex\Application $app) {
-	
+
 	$title = "About";
     $users = $app['users']->getUsers();
-    
+
 	return $app['twig']->render('base.twig', array('users' => $users, 'title' => $title));
-	
+
 })->before($checkLogin)->bind('about');
 
 
@@ -339,12 +334,12 @@ $backend->get("/about", function(Silex\Application $app) {
  * Show a list of all available users.
  */
 $backend->get("/users", function(Silex\Application $app) {
-	
+
 	$title = "Users";
     $users = $app['users']->getUsers();
-    
+
 	return $app['twig']->render('users.twig', array('users' => $users, 'title' => $title));
-	
+
 })->before($checkLogin)->bind('users');
 
 
@@ -355,48 +350,48 @@ $backend->get("/user/{action}/{id}", function(Silex\Application $app, $action, $
 
 
     $user = $app['users']->getUser($id);
-    
+
     if (!$user) {
-        $app['session']->setFlash('error', "No such user.");
-        return $app->redirect('/pilex/users'); 
+        $app['session']->getFlashBag()->add('error', "No such user.");
+        return $app->redirect('/pilex/users');
     }
 
     switch ($action) {
-        
+
         case "disable":
             if ($app['users']->setEnabled($id, 0)) {
-                $app['session']->setFlash('info', "User '{$user['displayname']}' is disabled.");
+                $app['session']->getFlashBag()->add('info', "User '{$user['displayname']}' is disabled.");
             } else {
-                $app['session']->setFlash('info', "User '{$user['displayname']}' could not be disabled.");
+                $app['session']->getFlashBag()->add('info', "User '{$user['displayname']}' could not be disabled.");
             }
-            return $app->redirect('/pilex/users'); 
+            return $app->redirect('/pilex/users');
             break;
-        
+
         case "enable":
             if ($app['users']->setEnabled($id, 1)) {
-                $app['session']->setFlash('info', "User '{$user['displayname']}' is enabled.");
+                $app['session']->getFlashBag()->add('info', "User '{$user['displayname']}' is enabled.");
             } else {
-                $app['session']->setFlash('info', "User '{$user['displayname']}' could not be enabled.");        
+                $app['session']->getFlashBag()->add('info', "User '{$user['displayname']}' could not be enabled.");
             }
-            return $app->redirect('/pilex/users'); 
+            return $app->redirect('/pilex/users');
             break;
-                    
+
         case "delete":
-            if ($app['users']->deleteUser($id)) {    
-                $app['session']->setFlash('info', "User '{$user['displayname']}' is deleted.");
+            if ($app['users']->deleteUser($id)) {
+                $app['session']->getFlashBag()->add('info', "User '{$user['displayname']}' is deleted.");
             } else {
-                $app['session']->setFlash('info', "User '{$user['displayname']}' could not be deleted.");    
+                $app['session']->getFlashBag()->add('info', "User '{$user['displayname']}' could not be deleted.");
             }
-            return $app->redirect('/pilex/users');         
+            return $app->redirect('/pilex/users');
             break;
-                
+
         default:
-            $app['session']->setFlash('error', "No such action for user '{$user['displayname']}'.");
-            return $app->redirect('/pilex/users'); 
-        
+            $app['session']->getFlashBag()->add('error', "No such action for user '{$user['displayname']}'.");
+            return $app->redirect('/pilex/users');
+
     }
 
-	
+
 })->before($checkLogin)->bind('useraction');
 
 
@@ -417,7 +412,7 @@ if ( $app['debug'] ) {
             ));
         }
     });
-    
+
     /*
     $app->after(function(Request $request, Response $response) use ($app, $logger) {
         // Log all queries as DEBUG.
@@ -437,44 +432,44 @@ if ( $app['debug'] ) {
 // Temporary hack. Silex should start session on demand.
 $app->before(function() use ($app) {
     global $pilex_name, $pilex_version;
-    
+
     $app['session']->start();
-    
+
     $app['twig']->addGlobal('pilex_name', $pilex_name);
     $app['twig']->addGlobal('pilex_version', $pilex_version);
-    
+
 });
 
 if ($app['debug']) {
-    
+
     // On 'finish' attach the debug-bar, if debug is enabled..
     $app->finish(function(Request $request, Response $response) use ($app, $logger) {
 
         $queries = array();
         $querycount = 0;
         $querytime = 0;
-           
+
         foreach ( $logger->queries as $query ) {
             $queries[] = array(
-                'query' => $query['sql'], 
+                'query' => $query['sql'],
                 'params' => $query['params'],
-                'types' => $query['types'], 
+                'types' => $query['types'],
                 'duration' => sprintf("%0.2f", $query['executionMS'])
             );
-            
+
             $querycount++;
             $querytime += $query['executionMS'];
-            
-        }    
+
+        }
 
 
         $twig = $app['twig.loader'];
         $templates = hackislyParseRegexTemplates($twig);
-        
+
         $route = $request->get('_route') ;
         $route_params = $request->get('_route_params') ;
-        
-        
+
+
         $servervars = array(
             'cookies <small>($_COOKIES)</small>' => $request->cookies->all(),
             'headers' => makeValuepairs($request->headers->all(), '', '0'),
@@ -485,8 +480,8 @@ if ($app['debug']) {
             'response' => makeValuepairs($response->headers->all(), '', '0'),
             'statuscode' => $response->getStatusCode()
         );
-        
-     
+
+
         echo $app['twig']->render('debugbar.twig', array(
             'timetaken' => timeTaken(),
             'memtaken' => getMem(),
@@ -499,14 +494,14 @@ if ($app['debug']) {
             'route' => "/".$route,
             'route_params' => json_encode($route_params)
         ));
-    
-    
 
-    
-    
+
+
+
+
     });
 
-} 
+}
 
 
 

@@ -1,8 +1,8 @@
 
 database:
-  username: bolt_news
-  password: XXXXXXXXXX
-  databasename: bolt_news
+  username: root
+  password: root%1
+  databasename: news
   prefix: news
 
 sitename: Pilex news
