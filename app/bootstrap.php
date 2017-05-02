@@ -34,7 +34,7 @@ $app->register(new Silex\Provider\MonologServiceProvider(), array(
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => $config['twigpath'],
-    'twig.options' => array('debug'=>true, 'cache' => __DIR__.'/cache/' ), 
+    'twig.options' => array('debug'=>true, 'cache' => __DIR__.'/cache/' ),
 ));
 
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
@@ -61,11 +61,6 @@ if (!function_exists('intl_get_error_code')) {
     require_once __DIR__.'/../vendor/symfony/Locale/Symfony/Component/Locale/Resources/stubs/functions.php';
     require_once __DIR__.'/../vendor/symfony/Locale/Symfony/Component/Locale/Resources/stubs/IntlDateFormatter.php';
 }
-
-
-
-
-
 
 $app['storage'] = new Storage($app);
 

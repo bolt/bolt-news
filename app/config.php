@@ -11,6 +11,7 @@ $config['contenttypes'] = $yamlparser->parse(file_get_contents(__DIR__.'/config/
 if (file_exists(__DIR__.'/config/auth.yml')) {
     $authConfig = $yamlparser->parse(file_get_contents(__DIR__ . '/config/auth.yml'));
     $config['general']['database'] = $authConfig['database'];
+    $config['general']['piwik_token'] = $authConfig['piwik_token'];
 }
 $configdb = $config['general']['database'];
 

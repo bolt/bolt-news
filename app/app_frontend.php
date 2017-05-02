@@ -61,14 +61,25 @@ $app->get("/", function(Silex\Application $app) {
         );
 
         $row = $app['storage']->db->insert('newshits', $record);
-
     }
 
+    // Track Piwik
+    require_once dirname(__DIR__) . "/vendor/piwik/piwik-php-tracker/PiwikTracker.php";
+
+    $piwikTracker = new PiwikTracker($idSite = 2);
+    PiwikTracker::$URL = 'https://stats.bolt.cm';
+    $piwikTracker->setTokenAuth($app['config']['general']['piwik_token']);
+
+    $piwikTracker->setUrlReferrer(base64_decode($_GET['name']));
+    $piwikTracker->setIp($_SERVER['REMOTE_ADDR']);
+    $piwikTracker->setCustomVariable(1, 'version', $version, 'visit');
+    $piwikTracker->setCustomVariable(2, 'php', $php, 'visit');
+    $piwikTracker->setCustomVariable(3, 'db', $db, 'visit');
+
+    // Sends Tracker request via http
+    $piwikTracker->doTrackPageView('News');
+
     return $app->json($items);
-
-    //$body = $app['twig']->render('index.twig');
-    //return new Response($body, 200, array('Cache-Control' => 's-maxage=3600, public'));
-
 });
 
 

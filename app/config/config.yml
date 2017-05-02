@@ -8,3 +8,4 @@ database:
 sitename: Pilex news
 homepage: page/1
 homepage_template: index.twig
+debug: true
