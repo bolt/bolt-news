@@ -72,6 +72,7 @@ $app->get("/", function(Silex\Application $app) {
 
     $piwikTracker->setUrlReferrer(base64_decode($_GET['name']));
     $piwikTracker->setIp($_SERVER['REMOTE_ADDR']);
+    $piwikTracker->setUrl(base64_decode($_GET['name']));
     $piwikTracker->setCustomVariable(1, 'version', $version, 'visit');
     $piwikTracker->setCustomVariable(2, 'php', $php, 'visit');
     $piwikTracker->setCustomVariable(3, 'db', $db, 'visit');
