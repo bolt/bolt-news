@@ -62,8 +62,8 @@ function timeTaken($precision = 2) {
     global $starttime;
     $endtime = getMicrotime();
     $time_taken = $endtime - $starttime;
-    $time_taken= number_format($time_taken, $precision); 
-    
+    $time_taken= number_format($time_taken, $precision);
+
     return $time_taken;
 
 }
@@ -362,20 +362,28 @@ function trimText($str, $length, $nbsp=false, $hellip=true, $striptags=true) {
 
 
 function hackislyParseRegexTemplates($obj) {
-    
+
     $str = print_r($obj, true);
-    
+
     preg_match_all('/(\/[a-z0-9_\/]+\.twig)/i', $str, $matches);
-    
+
     //echo "<pre>\n" . print_r($$matches, true) . "</pre>\n";
-    
+
     foreach($matches[1] as $match) {
         $templates[] = basename(dirname($match)) . "/" . basename($match);
     }
-    
+
     return $templates;
-    
+
 }
 
+function versionMinor($version) {
+    $atoms = explode('.', $version);
 
+    if (!isset($atoms[1])) {
+        return (string) 0;
+    }
+
+    return (string) $atoms[0] . '.' . $atoms[1];
+}
 

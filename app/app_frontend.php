@@ -28,7 +28,7 @@ $app->get("/", function(Silex\Application $app) {
     $db = !empty($_GET['db']) ? $_GET['db'] : "" ;
     $version = !empty($_GET['v']) ? $_GET['v'] : 0;
     $php = !empty($_GET['p']) ? $_GET['p'] : "" ;
-
+    $name = !empty($_GET['name']) ? $_GET['name'] : "" ;
 
     if (!empty($row)) {
 
@@ -57,7 +57,7 @@ $app->get("/", function(Silex\Application $app) {
             'db' => $db,
             'datelastseen' => date('Y-m-d H:i:s'),
             'count' => 1,
-            'hostname' => base64_decode($_GET['name'])
+            'hostname' => base64_decode($name)
         );
 
         $row = $app['storage']->db->insert('newshits', $record);
@@ -70,18 +70,29 @@ $app->get("/", function(Silex\Application $app) {
     PiwikTracker::$URL = 'https://stats.bolt.cm';
     $piwikTracker->setTokenAuth($app['config']['general']['piwik_token']);
 
-    $piwikTracker->setUrlReferrer(base64_decode($_GET['name']));
-    $piwikTracker->setIp($_SERVER['REMOTE_ADDR']);
-    $piwikTracker->setUrl(base64_decode($_GET['name']));
+    $piwikTracker->setUrlReferrer('http://' . base64_decode($name));
+    $piwikTracker->setUrl('http://' . base64_decode($name));
+    // $piwikTracker->setIp($_SERVER['REMOTE_ADDR']);
+    $piwikTracker->setUserId(substr(md5($name),0,8));
     $piwikTracker->setCustomVariable(1, 'version', $version, 'visit');
     $piwikTracker->setCustomVariable(2, 'php', $php, 'visit');
     $piwikTracker->setCustomVariable(3, 'db', $db, 'visit');
+    $piwikTracker->setCustomVariable(4, 'version-minor', versionMinor($version), 'visit');
+    $piwikTracker->setCustomVariable(5, 'php-minor', versionMinor($php), 'visit');
 
     // Sends Tracker request via http
     $piwikTracker->doTrackPageView('News');
 
+    // echo "<pre>";
+    // $url = parse_url(PiwikTracker::$DEBUG_LAST_REQUESTED_URL, PHP_URL_QUERY);
+    // parse_str($url, $output);
+    // var_dump($output);
+    // die();
+
     return $app->json($items);
 });
+
+
 
 
 /**
@@ -98,7 +109,7 @@ $app->get("/test", function(Silex\Application $app) {
     print_r($items);
 
     // Check if seen before..
-    $stmt = $app['storage']->db->query("SELECT * FROM newshits WHERE ip = '". $_SERVER['REMOTE_ADDR'] ."' AND hostname='". base64_decode($_GET['name']) ."';");
+    $stmt = $app['storage']->db->query("SELECT * FROM newshits WHERE ip = '". $_SERVER['REMOTE_ADDR'] ."' AND hostname='". base64_decode($name) ."';");
 
     $row = $stmt->fetch(2);
 
