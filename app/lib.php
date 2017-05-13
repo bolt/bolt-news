@@ -387,3 +387,65 @@ function versionMinor($version) {
     return (string) $atoms[0] . '.' . $atoms[1];
 }
 
+function trackPiwik($token, $name, $version, $php, $db)
+{
+    // don't log requests without parameters, since they're probably spiders or
+    // people curious about what news.bolt.cm does.
+    if (empty($name)) {
+        return;
+    }
+
+    require_once dirname(__DIR__) . "/vendor/piwik/piwik-php-tracker/PiwikTracker.php";
+
+    $piwikTracker = new PiwikTracker($idSite = 2);
+    PiwikTracker::$URL = 'http://stats.bolt.cm';
+    $piwikTracker->setTokenAuth($token);
+
+    $piwikTracker->setUrlReferrer('http://' . $name);
+    $piwikTracker->setUrl('http://' . $name);
+    $piwikTracker->setIp($_SERVER[' REMOTE_ADDR']);
+    $piwikTracker->setUserId(substr(md5($name),0,8));
+    $piwikTracker->setCustomVariable(1, 'version', $version, 'visit');
+    $piwikTracker->setCustomVariable(2, 'php', $php, 'visit');
+    $piwikTracker->setCustomVariable(3, 'db', $db, 'visit');
+    $piwikTracker->setCustomVariable(4, 'version-minor', versionMinor($version), 'visit');
+    $piwikTracker->setCustomVariable(5, 'php-minor', versionMinor($php), 'visit');
+
+    // Sends Tracker request via http
+    $res = $piwikTracker->doTrackPageView('News');
+
+    // echo "<pre>";
+    // $url = parse_url(PiwikTracker::$DEBUG_LAST_REQUESTED_URL, PHP_URL_QUERY);
+    // parse_str($url, $output);
+    // var_dump($res);
+    // var_dump($output);
+    // die();
+
+}
+
+function getName()
+{
+    $name = !empty($_GET['name']) ? $_GET['name'] : "" ;
+
+    if (validBase64($name)) {
+        $name = base64_decode($name);
+    }
+
+    return safeString($name);
+}
+
+function validBase64($string)
+{
+    $decoded = base64_decode($string, true);
+
+    // Check if there is no invalid character in string
+    if (!preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $string)) return false;
+
+    // Decode the string in strict mode and send the response
+    if (!base64_decode($string, true)) return false;
+
+    // Encode and compare it to original one
+    if (base64_encode($decoded) != $string) return false;
+
+    return true;
+}
