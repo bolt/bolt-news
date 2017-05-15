@@ -398,7 +398,7 @@ function trackPiwik($token, $name, $version, $php, $db)
     require_once dirname(__DIR__) . "/vendor/piwik/piwik-php-tracker/PiwikTracker.php";
 
     $piwikTracker = new PiwikTracker($idSite = 2);
-    PiwikTracker::$URL = 'https://stats.bolt.cm';
+    PiwikTracker::$URL = 'http://stats.bolt.cm';
     $piwikTracker->setTokenAuth($token);
 
     $piwikTracker->setUrlReferrer('http://' . $name);
